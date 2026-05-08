@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #0a0e1a;
+    color: #e8dcc8;
+  }
+}
+
+@layer components {
+  /* Pirate card style */
+  .pirate-card {
+    @apply bg-gradient-to-br from-hull/90 to-ocean/95 border border-gold/25 rounded-xl p-5 relative overflow-hidden;
+  }
+  .pirate-card::before {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold-light/50 to-transparent;
+  }
+
+  /* Gold button */
+  .btn-gold {
+    @apply font-pirata tracking-wide cursor-pointer rounded-lg transition-all duration-200
+           bg-gradient-to-br from-yellow-700 via-gold to-yellow-600
+           text-ocean shadow-lg shadow-gold/30 hover:-translate-y-0.5
+           hover:shadow-xl hover:shadow-gold/40 active:translate-y-0 disabled:opacity-40;
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply font-crimson cursor-pointer rounded-lg border border-white/15 text-skull
+           transition-all duration-200 hover:border-gold hover:text-gold-light;
+  }
+
+  /* Bust button */
+  .btn-bust {
+    @apply font-pirata tracking-wide cursor-pointer rounded-lg transition-all duration-200
+           bg-gradient-to-br from-blood/60 to-blood/80 border border-blood-light/40
+           text-red-300 hover:shadow-lg hover:shadow-blood/30;
+  }
+
+  /* Confirm button */
+  .btn-confirm {
+    @apply font-pirata tracking-wide cursor-pointer rounded-lg transition-all duration-200
+           bg-gradient-to-br from-emerald-900/60 to-emerald-950/80 border border-emerald-600/40
+           text-emerald-300 hover:shadow-lg hover:shadow-emerald-600/25;
+  }
+
+  /* Section label */
+  .section-label {
+    @apply font-mono text-[0.58rem] uppercase tracking-[3px] text-foam/40 text-center mb-2;
+  }
+}
