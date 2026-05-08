@@ -8,9 +8,9 @@ export default defineConfig({
     SvelteKitPWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: '1000 Bommen & Granaten',
+        name: 'Bommen & Granaten',
         short_name: 'B&G',
-        description: 'Scorebord voor 1000 Bommen & Granaten',
+        description: 'Scorebord voor Bommen & Granaten',
         theme_color: '#0a0e1a',
         background_color: '#0a0e1a',
         display: 'standalone',

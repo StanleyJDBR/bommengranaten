@@ -47,7 +47,7 @@
   <div class="pt-8 pb-12">
     <header class="text-center mb-6">
       <h1 class="font-pirata text-gold-light text-5xl leading-tight" style="text-shadow: 0 0 40px rgba(201,146,42,0.5)">
-        ☠️ 1000 Bommen<br>& Granaten
+        ☠️ Bommen<br>& Granaten
       </h1>
       <p class="font-mono text-[0.6rem] uppercase tracking-[4px] text-foam/50 mt-2">Scorebord</p>
       <div class="flex items-center gap-3 mt-4">

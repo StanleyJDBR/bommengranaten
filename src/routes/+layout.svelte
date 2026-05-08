@@ -5,7 +5,7 @@
 </script>
 
 <svelte:head>
-  <title>1000 Bommen & Granaten</title>
+  <title>Bommen & Granaten</title>
 </svelte:head>
 
 <main class="max-w-[580px] mx-auto px-4 pb-6">

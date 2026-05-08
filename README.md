@@ -1,6 +1,6 @@
-# ☠️ 1000 Bommen & Granaten — SvelteKit Scorebord
+# ☠️ Bommen & Granaten — SvelteKit Scorebord
 
-Een PWA scorebord voor het dobbelspel **1000 Bommen & Granaten**, gebouwd met SvelteKit + Drizzle ORM + Turso.
+Een PWA scorebord voor het dobbelspel **Bommen & Granaten**, gebouwd met SvelteKit + Drizzle ORM + Turso.
 
 ## Stack
 
