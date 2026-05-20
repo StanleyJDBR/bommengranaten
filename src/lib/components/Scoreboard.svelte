@@ -1,9 +1,6 @@
 <!-- src/lib/components/Scoreboard.svelte -->
 <script lang="ts">
-  import { game, currentPlayer, type Player } from '$lib/stores/game';
-
-  const WIN_SCORE = 6000;
-  const QUICK = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000];
+  import { game, currentPlayer, WIN_SCORE, QUICK_SCORES } from '$lib/stores/game';
 
   let scoreInput = 0;
 
@@ -36,47 +33,40 @@
         {isCurrent ? 'border-gold shadow-[0_0_20px_rgba(201,146,42,0.3)]' : 'border-gold/20'}
       "
     >
-      <!-- Current player indicator -->
       {#if isCurrent}
-        <div class="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-gold-light to-gold rounded-l-xl" />
+        <div class="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-gold-light to-gold rounded-l-xl"></div>
       {/if}
 
-      <!-- Player row -->
       <div class="flex items-center gap-3">
-        <!-- Avatar -->
         <div class="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-lg text-xl flex-shrink-0">
           {player.emoji}
         </div>
 
-        <!-- Info -->
         <div class="flex-1 min-w-0">
           <div class="font-semibold font-crimson truncate {isCurrent ? 'text-gold-light' : 'text-skull'}">
             {player.name}
           </div>
 
-          <!-- Badges -->
           <div class="flex gap-1 mt-1 flex-wrap">
             {#if isLeader && $game.players.length > 1}
               <span class="text-[0.55rem] font-mono uppercase tracking-wide px-1.5 py-0.5 rounded bg-gold/20 text-gold-light">🏆 #1</span>
             {/if}
             {#if player.score >= WIN_SCORE}
-              <span class="text-[0.55rem] font-mono uppercase tracking-wide px-1.5 py-0.5 rounded bg-gold/20 text-gold-light">⚡ 6000+</span>
+              <span class="text-[0.55rem] font-mono uppercase tracking-wide px-1.5 py-0.5 rounded bg-gold/20 text-gold-light">⚡ {WIN_SCORE}+</span>
             {/if}
             {#if $game.finalRound && player.id !== $game.finalRoundBy}
               <span class="text-[0.55rem] font-mono uppercase tracking-wide px-1.5 py-0.5 rounded bg-blood/30 text-red-400">⚠️ Laatste beurt</span>
             {/if}
           </div>
 
-          <!-- Progress bar -->
           <div class="mt-1.5 h-[2px] bg-white/8 rounded-full overflow-hidden">
             <div
               class="h-full bg-gradient-to-r from-gold to-gold-light rounded-full transition-all duration-700"
               style="width: {pct}%"
-            />
+            ></div>
           </div>
         </div>
 
-        <!-- Score -->
         <div class="text-right flex-shrink-0">
           <div class="font-pirata text-[1.9rem] text-gold-light leading-none" style="text-shadow: 0 0 16px rgba(201,146,42,0.35)">
             {player.score}
@@ -89,11 +79,8 @@
         </div>
       </div>
 
-      <!-- Expanded input for current player -->
       {#if isCurrent}
         <div class="mt-3 pt-3 border-t border-gold/15">
-
-          <!-- Score input -->
           <div class="relative mb-2.5">
             <input
               type="number"
@@ -116,19 +103,17 @@
             </button>
           </div>
 
-          <!-- Quick buttons -->
           <div class="grid grid-cols-4 gap-2 mb-3">
-            {#each QUICK as v}
+            {#each QUICK_SCORES as value}
               <button
                 class="btn-ghost py-5 text-[0.68rem] font-mono"
-                on:click={() => scoreInput += v}
+                on:click={() => scoreInput += value}
               >
-                {v >= 1000 ? (v / 1000) + 'K' : v}
+                {value >= 1000 ? (value / 1000) + 'K' : value}
               </button>
             {/each}
           </div>
 
-          <!-- Bust / Reset / Confirm -->
           <div class="grid grid-cols-3 gap-2">
             <button class="btn-bust py-3 text-[1.05rem]" on:click={handleBust}>
               💀 Bust!
@@ -140,7 +125,6 @@
               ✅ Bevestig
             </button>
           </div>
-
         </div>
       {/if}
     </div>

@@ -1,5 +1,5 @@
 // src/lib/stores/game.ts
-import { writable, derived, get } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 
 // ── TYPES ──────────────────────────────────────────────
 export interface Player {
@@ -50,7 +50,9 @@ export const PIRATE_CARDS = [
 
 export type CardId = typeof PIRATE_CARDS[number]['id'];
 
-const WIN_SCORE = 6000;
+export const WIN_SCORE = 6000;
+
+export const QUICK_SCORES = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000] as const;
 
 // ── INITIAL STATE ──────────────────────────────────────
 function createInitialState(): GameState {
@@ -85,57 +87,53 @@ function createGameStore() {
     },
 
     selectCard(cardId: string) {
-      update(s => ({ ...s, selectedCard: cardId }));
+      update(state => ({ ...state, selectedCard: cardId }));
     },
 
     confirmScore(rawScore: number) {
-      update(s => {
-        const player = s.players[s.currentIdx];
-        const card = PIRATE_CARDS.find(c => c.id === s.selectedCard);
-
-        let score = rawScore;
-        if (s.selectedCard === 'captain') score = rawScore * 2;
-
-        return applyTurn(s, player, score, false);
+      update(state => {
+        const player = state.players[state.currentIdx];
+        const score  = state.selectedCard === 'captain' ? rawScore * 2 : rawScore;
+        return applyTurn(state, player, score, false);
       });
     },
 
     bust() {
-      update(s => {
-        const player = s.players[s.currentIdx];
-        return applyTurn(s, player, 0, true);
+      update(state => {
+        const player = state.players[state.currentIdx];
+        return applyTurn(state, player, 0, true);
       });
     },
 
     undo() {
-      update(s => {
-        if (!s.history.length) return s;
+      update(state => {
+        if (!state.history.length) return state;
 
-        const last     = s.history[s.history.length - 1];
-        const players  = s.players.map(p =>
-          p.id === last.playerId
-            ? { ...p, score: p.score - last.score, history: p.history.slice(0, -1) }
-            : p
+        const last    = state.history[state.history.length - 1];
+        const players = state.players.map(player =>
+          player.id === last.playerId
+            ? { ...player, score: player.score - last.score, history: player.history.slice(0, -1) }
+            : player
         );
 
-        // Eindronde terugdraaien?
-        let { finalRound, finalRoundBy } = s;
-        const player = players.find(p => p.id === last.playerId)!;
-        if (finalRound && finalRoundBy === player.id && player.score < WIN_SCORE) {
+        // Reverse the final round if the player who triggered it dropped below WIN_SCORE
+        let { finalRound, finalRoundBy } = state;
+        const undonePlayer = players.find(player => player.id === last.playerId)!;
+        if (finalRound && finalRoundBy === undonePlayer.id && undonePlayer.score < WIN_SCORE) {
           finalRound = false; finalRoundBy = null;
         }
 
-        const prevIdx = (s.currentIdx - 1 + players.length) % players.length;
-        const round   = prevIdx === players.length - 1 && s.round > 1 ? s.round - 1 : s.round;
+        const prevIdx = (state.currentIdx - 1 + players.length) % players.length;
+        const round   = prevIdx === players.length - 1 && state.round > 1 ? state.round - 1 : state.round;
 
         return {
-          ...s,
+          ...state,
           players,
           currentIdx: prevIdx,
           round,
           finalRound,
           finalRoundBy,
-          history: s.history.slice(0, -1),
+          history:     state.history.slice(0, -1),
           selectedCard: null,
         };
       });
@@ -147,48 +145,48 @@ function createGameStore() {
   };
 }
 
-// ── HELPER: apply a turn + advance ─────────────────────
-function applyTurn(s: GameState, player: Player, score: number, busted: boolean): GameState {
-  const card     = PIRATE_CARDS.find(c => c.id === s.selectedCard);
+// ── HELPER ─────────────────────────────────────────────
+function applyTurn(state: GameState, player: Player, score: number, busted: boolean): GameState {
+  const card     = PIRATE_CARDS.find(pirate => pirate.id === state.selectedCard);
   const newScore = player.score + score;
 
   const entry: TurnEntry = {
-    round:      s.round,
+    round:      state.round,
     playerId:   player.id,
     playerName: player.name,
-    cardId:     s.selectedCard,
+    cardId:     state.selectedCard,
     cardIcon:   card?.icon ?? '—',
     score,
     busted,
     totalAfter: newScore,
   };
 
-  const players = s.players.map(p =>
-    p.id === player.id
-      ? { ...p, score: newScore, history: [...p.history, entry] }
-      : p
+  const players = state.players.map(existing =>
+    existing.id === player.id
+      ? { ...existing, score: newScore, history: [...existing.history, entry] }
+      : existing
   );
 
-  let { finalRound, finalRoundBy } = s;
+  let { finalRound, finalRoundBy } = state;
   if (!finalRound && newScore >= WIN_SCORE) {
-    finalRound = true;
+    finalRound   = true;
     finalRoundBy = player.id;
   }
 
-  // Check of eindronde klaar is
-  const gameEnderId = players.findIndex(p => p.id === finalRoundBy);
-  const nextIdx     = (s.currentIdx + 1) % players.length;
-  const gameOver    = finalRound && nextIdx === gameEnderId;
+  // Check if the final round is complete
+  const gameEnderIdx = players.findIndex(existing => existing.id === finalRoundBy);
+  const nextIdx      = (state.currentIdx + 1) % players.length;
+  const gameOver     = finalRound && nextIdx === gameEnderIdx;
 
   return {
-    ...s,
+    ...state,
     players,
-    history:      [...s.history, entry],
+    history:      [...state.history, entry],
     finalRound,
     finalRoundBy,
     selectedCard: null,
     currentIdx:   nextIdx,
-    round:        nextIdx === 0 ? s.round + 1 : s.round,
+    round:        nextIdx === 0 ? state.round + 1 : state.round,
     phase:        gameOver ? 'end' : 'playing',
   };
 }
@@ -196,10 +194,10 @@ function applyTurn(s: GameState, player: Player, score: number, busted: boolean)
 export const game = createGameStore();
 
 // ── DERIVED ────────────────────────────────────────────
-export const sortedPlayers = derived(game, $g =>
-  [...$g.players].sort((a, b) => b.score - a.score)
+export const sortedPlayers = derived(game, $gameState =>
+  [...$gameState.players].sort((a, b) => b.score - a.score)
 );
 
-export const currentPlayer = derived(game, $g =>
-  $g.players[$g.currentIdx] ?? null
+export const currentPlayer = derived(game, $gameState =>
+  $gameState.players[$gameState.currentIdx] ?? null
 );
