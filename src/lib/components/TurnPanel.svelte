@@ -1,9 +1,8 @@
 <!-- src/lib/components/TurnPanel.svelte -->
 <script lang="ts">
   import { game, currentPlayer, PIRATE_CARDS } from '$lib/stores/game';
-  import CardSelector from './CardSelector.svelte';
 
-  const QUICK = [100, 200, 300, 400, 500, 600, 800, 1000, 1500, 2000];
+  const QUICK = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000];
 
   let scoreInput = 0;
   let deathIslandSkulls = 0;
@@ -24,7 +23,6 @@
   }
 
   function handleConfirm() {
-    if (scoreInput < 0) return;
     game.confirmScore(scoreInput);
     scoreInput = 0;
   }
@@ -48,41 +46,41 @@
           Beurt van {$currentPlayer.name}
         </h3>
         <p class="text-foam/60 text-sm">
-          {$game.finalRound ? '⚠️ Laatste beurt!' : 'Trek een piratenkaart'}
+          {$game.finalRound ? '⚠️ Laatste beurt!' : ''}
         </p>
       </div>
       <span class="font-mono text-[0.6rem] text-foam/40">Ronde {$game.round}</span>
     </div>
 
-    <!-- Card selector -->
-    <div class="section-label">Piratenkaart</div>
-    <CardSelector
-      selected={$game.selectedCard}
-      onSelect={(id) => game.selectCard(id)}
-    />
-
     <!-- Score input -->
     <div class="section-label mt-3">Punten deze beurt</div>
-    <input
-      type="number"
-      bind:value={scoreInput}
-      min="0"
-      step="50"
-      placeholder="0"
-      class="
-        w-full bg-white/5 border border-gold/25 rounded-lg px-4 py-2.5
-        text-gold-light font-pirata text-[1.7rem] text-center outline-none mb-2.5
-        focus:border-gold transition-colors [appearance:textfield]
-        [&::-webkit-outer-spin-button]:appearance-none
-        [&::-webkit-inner-spin-button]:appearance-none
-      "
-    />
+    <div class="relative mb-2.5">
+      <input
+        type="number"
+        bind:value={scoreInput}
+        step="50"
+        placeholder="0"
+        class="
+          w-full bg-white/5 border border-gold/25 rounded-lg px-4 py-2.5
+          text-gold-light font-pirata text-[1.7rem] text-center outline-none
+          focus:border-gold transition-colors [appearance:textfield]
+          [&::-webkit-outer-spin-button]:appearance-none
+          [&::-webkit-inner-spin-button]:appearance-none
+        "
+      />
+      <button
+        class="absolute inset-y-0 right-3 text-[1.4rem] font-pirata text-gold/60 hover:text-gold transition-colors leading-none"
+        on:click={() => scoreInput = -scoreInput}
+      >
+        +-
+      </button>
+    </div>
 
     <!-- Quick buttons -->
-    <div class="grid grid-cols-5 gap-1.5 mb-3">
+    <div class="grid grid-cols-4 gap-2 mb-4">
       {#each QUICK as v}
         <button
-          class="btn-ghost py-1.5 text-[0.68rem] font-mono"
+          class="btn-ghost py-5 text-[0.68rem] font-mono"
           on:click={() => addQuick(v)}
         >
           {v >= 1000 ? (v / 1000) + 'K' : v}
@@ -93,10 +91,10 @@
     <!-- Bust / Confirm -->
     <div class="grid grid-cols-2 gap-2">
       <button class="btn-bust py-3 text-[1.05rem]" on:click={handleBust}>
-        💀 Bust!
+        Bust!
       </button>
       <button class="btn-confirm py-3 text-[1.05rem]" on:click={handleConfirm}>
-        ⚓ Bevestig
+        Bevestig
       </button>
     </div>
   </div>

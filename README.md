@@ -112,7 +112,6 @@ src/
 │   ├── components/
 │   │   ├── Scoreboard.svelte     ← Ranglijst met voortgangsbalken
 │   │   ├── TurnPanel.svelte      ← Beurt invoer + kaart selectie
-│   │   └── CardSelector.svelte   ← Piratenkaarten grid
 │   ├── stores/
 │   │   └── game.ts               ← Centrale spelstate (Svelte stores)
 │   └── db/

@@ -8,8 +8,6 @@
     } from "$lib/stores/game";
     import Scoreboard from "$lib/components/Scoreboard.svelte";
     import TurnPanel from "$lib/components/TurnPanel.svelte";
-    import { goto } from "$app/navigation";
-
     // Setup state
     let playerNames: string[] = ["", ""];
 
@@ -29,25 +27,6 @@
 
     // History toggle
     let showHistory = false;
-
-    // Save finished game to DB
-    async function saveGame() {
-        await fetch("/api/games", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                players: $game.players.map((p) => ({
-                    name: p.name,
-                    score: p.score,
-                })),
-                turns: $game.history,
-                round: $game.round,
-            }),
-        });
-    }
-
-    // Trigger save when game ends
-    $: if ($game.phase === "end") saveGame();
 </script>
 
 <!-- ══ SETUP ══════════════════════════════ -->
@@ -123,13 +102,6 @@
             >Begin het spel!</button
         >
 
-        <div class="text-center mt-4">
-            <a
-                href="/stats"
-                class="text-foam/50 text-sm hover:text-foam transition-colors"
-                >Statistieken bekijken</a
-            >
-        </div>
     </div>
 
     <!-- ══ PLAYING ════════════════════════════ -->
@@ -237,11 +209,6 @@
                     if (confirm("Nieuw spel starten?")) game.reset();
                 }}>🔄 Nieuw spel</button
             >
-            <a
-                href="/stats"
-                class="btn-ghost flex-1 py-2 text-[0.75rem] text-center"
-                >📊 Stats</a
-            >
         </div>
     </div>
 
@@ -258,7 +225,7 @@
             <p
                 class="font-mono text-[0.6rem] uppercase tracking-[4px] text-foam/50 mt-2"
             >
-                De winnaars zijn bekend
+                De winnaar is bekend
             </p>
             <div class="flex items-center gap-3 mt-4">
                 <div
@@ -325,12 +292,6 @@
         >
             ⚓ Nieuw Spel
         </button>
-        <a
-            href="/stats"
-            class="block text-foam/50 text-sm hover:text-foam transition-colors"
-        >
-            Bekijk alle statistieken
-        </a>
     </div>
 {/if}
 

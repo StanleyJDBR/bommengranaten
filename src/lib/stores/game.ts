@@ -124,7 +124,7 @@ function createGameStore() {
         if (skulls > 0) {
           updated.players = s.players.map((p, i) =>
             i !== s.currentIdx
-              ? { ...p, score: Math.max(0, p.score - skulls * 100) }
+              ? { ...p, score: p.score - skulls * 100 }
               : p
           );
         }
@@ -140,7 +140,7 @@ function createGameStore() {
         const last     = s.history[s.history.length - 1];
         const players  = s.players.map(p =>
           p.id === last.playerId
-            ? { ...p, score: Math.max(0, p.score - last.score), history: p.history.slice(0, -1) }
+            ? { ...p, score: p.score - last.score, history: p.history.slice(0, -1) }
             : p
         );
 
@@ -178,7 +178,7 @@ function createGameStore() {
 // ── HELPER: apply a turn + advance ─────────────────────
 function applyTurn(s: GameState, player: Player, score: number, busted: boolean): GameState {
   const card     = PIRATE_CARDS.find(c => c.id === s.selectedCard);
-  const newScore = Math.max(0, player.score + score);
+  const newScore = player.score + score;
 
   const entry: TurnEntry = {
     round:      s.round,
