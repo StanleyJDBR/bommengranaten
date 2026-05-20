@@ -7,9 +7,10 @@
         PLAYER_EMOJIS,
     } from "$lib/stores/game";
     import Scoreboard from "$lib/components/Scoreboard.svelte";
-    import TurnPanel from "$lib/components/TurnPanel.svelte";
+    import Toggle from "$lib/components/Toggle.svelte";
     // Setup state
     let playerNames: string[] = ["", ""];
+    let shuffle = true;
 
     function addPlayer() {
         if (playerNames.length < 8) playerNames = [...playerNames, ""];
@@ -21,7 +22,13 @@
     }
 
     function startGame() {
-        const names = playerNames.map((n, i) => n.trim() || `Speler ${i + 1}`);
+        let names = playerNames.map((n, i) => n.trim() || `Speler ${i + 1}`);
+        if (shuffle) {
+            for (let i = names.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [names[i], names[j]] = [names[j], names[i]];
+            }
+        }
         game.startGame(names);
     }
 
@@ -55,26 +62,27 @@
             </div>
         </header>
 
-        <div class="pirate-card mb-3">
-            <h3 class="font-pirata text-gold-light text-lg mb-4 tracking-wide">
-                Spelers
-            </h3>
+        <div class="pirate-card mb-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-pirata text-gold-light text-lg tracking-wide">
+                    Spelers
+                </h3>
+                <Toggle bind:value={shuffle} label="Husselen" />
+            </div>
             <div class="flex flex-col gap-2">
                 {#each playerNames as name, i}
                     <div class="flex items-center gap-2">
-                        <span class="text-xl w-8 text-center"
-                            >{PLAYER_EMOJIS[i]}</span
-                        >
+                        <span class="text-xl w-8 text-center">{PLAYER_EMOJIS[i]}</span>
                         <input
                             type="text"
                             bind:value={playerNames[i]}
                             placeholder="Speler {i + 1}"
                             maxlength="20"
                             class="
-                flex-1 bg-white/5 border border-gold/25 rounded-lg px-3 py-2
-                text-skull font-crimson text-base outline-none
-                focus:border-gold transition-colors placeholder:text-skull/25
-              "
+                                flex-1 bg-white/5 border border-gold/25 rounded-lg px-3 py-2
+                                text-skull font-crimson text-base outline-none
+                                focus:border-gold transition-colors placeholder:text-skull/25
+                            "
                         />
                         {#if i >= 2}
                             <button
@@ -87,16 +95,17 @@
                     </div>
                 {/each}
             </div>
+            {#if playerNames.length < 8}
+                <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gold/15">
+                    <div class="w-8 flex-shrink-0" />
+                    <button
+                        class="btn-ghost flex-1 py-2.5 font-pirata tracking-wide"
+                        on:click={addPlayer}>+ Speler toevoegen</button
+                    >
+                    <div class="w-8 flex-shrink-0" />
+                </div>
+            {/if}
         </div>
-
-        {#if playerNames.length < 8}
-            <div class="pirate-card mb-3 py-3">
-                <button
-                    class="btn-ghost w-full py-2.5 font-pirata tracking-wide"
-                    on:click={addPlayer}>+ Speler toevoegen</button
-                >
-            </div>
-        {/if}
 
         <button class="btn-gold w-full py-4 text-xl" on:click={startGame}
             >Begin het spel!</button
@@ -107,10 +116,10 @@
     <!-- ══ PLAYING ════════════════════════════ -->
 {:else if $game.phase === "playing"}
     <div class="pt-4 pb-20">
-        <header class="text-center mb-3">
+        <header class="text-center mb-6">
             <h1
-                class="font-pirata text-gold-light text-2xl"
-                style="text-shadow: 0 0 30px rgba(201,146,42,0.4)"
+                class="font-pirata text-gold-light text-5xl leading-tight"
+                style="text-shadow: 0 0 40px rgba(201,146,42,0.5)"
             >
                 Bommen & Granaten
             </h1>
@@ -134,8 +143,6 @@
 
         <div class="section-label">Ranglijst</div>
         <div class="mb-3"><Scoreboard /></div>
-
-        <TurnPanel />
 
         <!-- Scorehistorie -->
         <div class="text-center mb-2">
@@ -207,7 +214,7 @@
                 class="btn-ghost flex-1 py-2 text-[0.75rem]"
                 on:click={() => {
                     if (confirm("Nieuw spel starten?")) game.reset();
-                }}>🔄 Nieuw spel</button
+                }}>↺ Nieuw spel</button
             >
         </div>
     </div>

@@ -29,8 +29,6 @@ export interface GameState {
   finalRound:    boolean;
   finalRoundBy:  number | null;
   history:       TurnEntry[];
-  deathIsland:   boolean;
-  extraSkulls:   number;
   phase:         'setup' | 'playing' | 'end';
 }
 
@@ -64,8 +62,6 @@ function createInitialState(): GameState {
     finalRound:   false,
     finalRoundBy: null,
     history:      [],
-    deathIsland:  false,
-    extraSkulls:  0,
     phase:        'setup',
   };
 }
@@ -111,28 +107,6 @@ function createGameStore() {
       });
     },
 
-    setExtraSkulls(n: number) {
-      update(s => ({ ...s, extraSkulls: Math.max(0, n) }));
-    },
-
-    endDeathIsland() {
-      update(s => {
-        const skulls = s.extraSkulls;
-        const updated = { ...s };
-
-        // Penaliseer alle andere spelers
-        if (skulls > 0) {
-          updated.players = s.players.map((p, i) =>
-            i !== s.currentIdx
-              ? { ...p, score: p.score - skulls * 100 }
-              : p
-          );
-        }
-
-        return applyTurn(updated, updated.players[s.currentIdx], 0, false);
-      });
-    },
-
     undo() {
       update(s => {
         if (!s.history.length) return s;
@@ -163,8 +137,6 @@ function createGameStore() {
           finalRoundBy,
           history: s.history.slice(0, -1),
           selectedCard: null,
-          deathIsland: false,
-          extraSkulls: 0,
         };
       });
     },
@@ -215,8 +187,6 @@ function applyTurn(s: GameState, player: Player, score: number, busted: boolean)
     finalRound,
     finalRoundBy,
     selectedCard: null,
-    deathIsland:  false,
-    extraSkulls:  0,
     currentIdx:   nextIdx,
     round:        nextIdx === 0 ? s.round + 1 : s.round,
     phase:        gameOver ? 'end' : 'playing',
